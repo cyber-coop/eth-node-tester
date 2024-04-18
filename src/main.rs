@@ -2,8 +2,25 @@ use postgres::{Client, NoTls};
 use std::net::TcpStream;
 use core::time::Duration;
 
+pub mod config;
+
 fn main() {
-    let mut client = Client::connect("host=localhost user=postgres password=wow dbname=blockchains", NoTls).unwrap();
+    let cfg = config::read_config();
+
+    /******************
+     * 
+     *  Connect to postgres
+     * 
+     ******************/
+     let database_params = format!(
+        "host={} user={} password={} dbname={}",
+        cfg.database.host,
+        cfg.database.user,
+        cfg.database.password,
+        cfg.database.dbname,
+    );    
+    
+    let mut client = Client::connect(&database_params, NoTls).expect("Connection error");
 
     let timeout_duration = Duration::from_millis(3000);
 
